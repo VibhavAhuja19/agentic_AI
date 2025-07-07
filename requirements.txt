@@ -18,3 +18,7 @@ google-search-results
 faiss-cpu
 sentence_transformers
 arxiv
+fastapi 
+uvicorn
+sqlalchemy
+streamlit
