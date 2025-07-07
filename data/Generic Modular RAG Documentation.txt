@@ -1,0 +1,74 @@
+﻿Generic Modular RAG Documentation
+
+
+Overview
+Generic Modular RAG (Retrieval-Augmented Generation) is a flexible and adaptable framework designed for efficient information retrieval and generation across various data formats and domains. It provides a plug-and-play architecture where individual components such as document loaders, chunkers, retrievers, vector stores, LLMs, and re-rankers can be integrated and customized as needed.
+Key features:
+* Modular design for easy customization and extension.
+* Compatibility with diverse file types and formats.
+* Scalable for both small-scale and enterprise-level applications.
+* Enables explainable and traceable outputs suitable for production environments.
+Step 1: Data Preprocessing & File Extraction
+To begin with, preprocess and extract content from various file types including .txt, .pdf, .csv, .xlsx, and .docx. Below are the recommended Python libraries for each format:
+File Format
+	Recommended Libraries
+	                 TXT
+	                                      built-in open(), pathlib
+	                 PDF
+	                                      PyMuPDF (fitz), PyPDF2, pdfminer.six
+	                 CSV
+	                                      pandas (pd.read_csv)
+	                XLSX
+	                                      pandas (pd.read_excel), openpyxl
+	                DOCX
+	                                      python-docx
+	These libraries enable robust extraction of text data, forming the foundation for further processing such as chunking, embedding, and retrieval in the RAG pipeline.
+Step 2: Embedding
+After text extraction, the next step is to convert the textual data into vector representations using embedding models. The text is first split into manageable chunks using a sliding window approach, which includes two key parameters:
+* chunk_size: the number of tokens/words per chunk.
+* chunk_overlap: the number of overlapping tokens between consecutive chunks.
+Given the variability of input documents, choosing the optimal chunk_size and chunk_overlap will require iterative experimentation.
+For embeddings, a variety of models can be used, including:
+* All-MiniLM (e.g., sentence-transformers/all-MiniLM-L6-v2)
+* Other open-source embedding models available via Hugging Face or local model stores
+These embeddings provide the basis for semantic search and retrieval in downstream RAG tasks.
+Step 3: Vector Store & Metadata Storage
+Once embeddings are generated, they are stored in a vector database for efficient similarity search. In this setup:
+* Embeddings are stored in Milvus (a high-performance vector database)
+* Raw or processed text and metadata are stored in PostgreSQL for relational querying and context retrieval
+For Milvus, we will experiment with different Similarity Metrics and Index Types to optimize retrieval performance. These include:
+Similarity Metrics
+* Euclidean (L2 distance)
+* Inner Product (IP)
+* Cosine Similarity
+Index Types
+* IVF_FLAT
+* IVF_SQ8
+* IVF_PQ
+* HNSW (Hierarchical Navigable Small World)
+* ANNOY (Approximate Nearest Neighbors Oh Yeah)
+
+
+The optimal choice depends on data characteristics, use case requirements, and latency constraints. This phase is experimental to find the best configuration for our data.
+To monitor and manage vector data in Milvus, we will use Attu — a graphical user interface for Milvus that supports inspection, querying, and monitoring of collections and indexes.
+Step 4: Open Source LLMs and Ollama
+This step involves integrating a large language model (LLM) to generate answers based on retrieved context. We utilize open-source LLMs for flexibility and cost efficiency. These models can be served locally using Ollama, which simplifies deployment and usage.
+Examples of open-source LLMs:
+* Mistral
+* LLaMA 2
+Ollama provides a fast and containerized interface to run these models efficiently on local machines.
+Step 5: Retrieval
+Retrieval is the core step in RAG where relevant chunks are fetched based on the user's query using vector similarity. Three main types of retrieval approaches are:
+1. Sparse Retrieval (e.g., BM25)
+2. Dense Retrieval (e.g., using embeddings and vector stores)
+3. Hybrid Retrieval (combining sparse and dense)
+These methods help extract the most relevant passages to pass as context to the LLM.
+Step 6: Reranking & Hybrid Search
+Reranking is the process of refining retrieved documents based on relevance scores. It helps prioritize better responses from the retrieved context.
+Types of Reranking:
+* Embedding-based (using cosine similarity again)
+* Cross-Encoder-based (using deep models like BERT for scoring query-document pairs)
+* Add other types of re ranking as well
+Hybrid search combines both sparse and dense retrieval methods, and reranking is often applied after this to fine-tune the results.
+Step 7: Response & History Management
+After generating the response using the LLM, the query-response pairs along with relevant metadata (timestamp, user ID, session ID, etc.) are stored in Redis. Redis provides fast in-memory storage, making it ideal for maintaining chat history and real-time analytics.
