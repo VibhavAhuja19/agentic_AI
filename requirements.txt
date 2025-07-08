@@ -22,3 +22,4 @@ fastapi
 uvicorn
 sqlalchemy
 streamlit
+langgraph-cli[inmem]
